@@ -1,0 +1,1145 @@
+20260820-1711-fs-io.txt
+FULLSTACK AI — INTEGRATED DESIGN-OPTIMIZATION PLAN
+Research integration timestamp: 2026-08-20 1711 MT
+Scope: fsghost8 + fsmono8, with fsdevlgr9-style observation/QA support
+Status: design/research integration; implementation decisions remain subject to
+benchmark gates
+
+================================================================================
+1. EXECUTIVE DESIGN CONCLUSION
+================================================================================
+
+The strongest conclusion from the accumulated Fullstack AI reading list and the
+2026-08-20 1500 research pass is:
+
+    Fullstack AI should optimize the CONTROL SYSTEM around the model before
+    optimizing for a larger or more elaborate model.
+
+The current optimization order should be:
+
+    MEASURE
+      -> STABILIZE
+      -> STRUCTURE
+      -> VERIFY
+      -> MANAGE STATE/CONTEXT
+      -> CACHE
+      -> ACCELERATE
+      -> ADAPT
+
+This is preferable to:
+
+    add features -> accelerate -> test afterward
+
+The highest-payoff work for fsghost8/fsmono8 is therefore:
+
+1. Stable structured decision representations.
+2. Explicit state/context lifecycle management.
+3. Executable verification, replay, and reliability measurement.
+4. Bounded agent-state transitions with checkpoint/rollback semantics.
+5. Retrieval and cache reuse that preserve provenance and correctness.
+6. Confidence-aware allocation of extra inference effort.
+7. Runtime acceleration only after the above are measurable.
+8. Adaptive/autotuned behavior only after stable metrics exist.
+
+Cross-model KV transfer, aggressive KV transformation/compression, inter-layer
+KV sharing, multi-model evolutionary orchestration, and major model-architecture
+changes remain measured experiments rather than v0 assumptions.
+
+
+================================================================================
+2. ARCHITECTURAL OWNERSHIP
+================================================================================
+
+fsghost8:
+- Owns controller semantics, state transitions, decision schemas, context
+  policy,
+  retrieval policy, tool policy, verification policy, routing/escalation
+  policy,
+  retry/backtrack policy, telemetry definitions, and reproducible traces.
+- Owns the distinction between robust/structured decisions and optional creative
+  presentation.
+- Owns adaptive-control decisions in later versions.
+
+fsmono8:
+- Integrates the same semantics into a tighter runtime path.
+- Owns runtime-level cache implementation, scheduling, memory movement,
+  inference fast paths, and opportunities to eliminate unnecessary
+  serialization,
+  copying, prefill, and process/interface overhead.
+- Must remain behaviorally comparable to fsghost8/reference paths.
+
+fsdevlgr9-style observation/QA support:
+- Observes both paths using the same metrics, test cases, traces, and regression
+  gates.
+- Does not become an excuse to move correctness logic out of fsghost8/fsmono8.
+
+Architecture rule:
+- Do not create extra binaries merely to represent planner, verifier, memory,
+  evaluator, generator, router, etc.
+- These may be logical modules/state-machine roles inside the existing design.
+
+
+================================================================================
+3. UPDATED PRIORITY MAP
+================================================================================
+
+P0 — REQUIRED BEFORE BROADER AGENTIC EXPANSION
+--------------------------------------------------------------------------------
+
+P0.1  Structured deterministic decision plane
+      fsghost8: core owner
+      fsmono8: integrated equivalent
+      Target: v0
+
+P0.2  Context garbage collection + durable external state
+      fsghost8: core owner
+      fsmono8: integrated equivalent
+      Target: v0
+
+P0.3  Executable verification + replay + reliability measurement
+      fsghost8: core owner
+      fsmono8: integrated equivalent
+      Target: v0
+
+P0.4  Explicit controller state machine
+      fsghost8: core owner
+      fsmono8: integrated equivalent
+      Target: v1 foundation, instrumented in v0
+
+P0.5  Provenance-aware just-in-time retrieval
+      fsghost8: core owner
+      fsmono8: integrated equivalent
+      Target: v0/v1
+
+P0.6  Decision uncertainty/margin telemetry
+      fsghost8: calculate and log action/decision ambiguity where possible
+      fsmono8: expose equivalent metrics
+      Target: v0 instrumentation, v1 policy use
+
+
+P1 — HIGH-VALUE SYSTEM OPTIMIZATIONS
+--------------------------------------------------------------------------------
+
+P1.1  Prefix/context/KV cache reuse
+P1.2  KV-cache TTL across tool pauses
+P1.3  Hierarchical cache tiers with cache-load-latency-aware scheduling
+P1.4  Capability-aware model routing/escalation
+P1.5  Confidence-aware test-time compute allocation
+P1.6  Checkpoint/backtrack/retry at explicit reversible branchpoints
+P1.7  Repetition-aware speculation for agent loops
+P1.8  Scheduler/runtime profiling by memory-bound vs compute-bound phase
+
+
+P2 — ADAPTIVE/AUTOTUNED EXPERIMENTS
+--------------------------------------------------------------------------------
+
+P2.1  Adaptive speculative decoding
+P2.2  Cross-model KV-cache transfer
+P2.3  Adaptive context curation/compaction
+P2.4  Batch/numeric determinism controls
+P2.5  Closed-loop selection of cache TTL, speculation depth, routing, retry
+      count, and context compression using verified-goodput metrics
+
+
+P3 — MODEL/RUNTIME RESEARCH, NOT V0 ASSUMPTIONS
+--------------------------------------------------------------------------------
+
+P3.1  Inter-layer KV sharing / KVAlign-like approaches
+P3.2  MoE, sparse/hybrid attention, Mamba/state-space variants
+P3.3  Operator-level runtime disaggregation for future hardware where useful
+P3.4  Aggressive latent/KV compression requiring model adaptation
+P3.5  Large multi-agent orchestration or evolutionary search
+
+
+================================================================================
+4. P0 DESIGN DETAILS
+================================================================================
+
+4.1 ROBUST DECISION REPRESENTATION BEFORE CREATIVE PRESENTATION
+--------------------------------------------------------------------------------
+
+Adopt the Invariant Newsletter's useful split:
+
+    ROBUST STAGE -> CREATIVE/PRESENTATION STAGE
+
+The first meaningful result from the model/controller should be a typed,
+machine-checkable decision object rather than free prose.
+
+Candidate fields:
+
+- goal
+- task_id
+- current_state
+- relevant_facts[]
+- evidence[]
+- provenance[]
+- hard_constraints[]
+- assumptions[]
+- uncertainties[]
+- candidate_actions[]
+- rubric_scores[]
+- selected_action
+- decision_margin
+- confidence/calibration fields
+- expected_effect
+- verification_required
+- verifier_id
+- rollback_available
+- stop/continue status
+- final_status
+
+The creative/presentation stage may turn the accepted structured result into
+natural language, but should not silently change the underlying decision.
+
+Design consequence:
+- Separate "what the system decided" from "how the system explained it."
+- Log both.
+- Evaluate them independently.
+
+
+4.2 THREE DIFFERENT FORMS OF DETERMINISM
+--------------------------------------------------------------------------------
+
+Fullstack AI should track three separate determinism objectives:
+
+A. Decision determinism
+   Same evidence/state should normally produce the same structured decision.
+
+B. Decoding determinism
+   Same prompt/tokens and fixed decoding policy should reproduce token
+   choices.
+
+C. Numeric/runtime determinism
+   Kernel order, batching, floating-point behavior, and scheduler behavior
+   should
+   not silently change logits/results when reproducibility is required.
+
+Important:
+- Greedy decoding is not equivalent to correctness.
+- Greedy decoding alone is not necessarily sufficient for runtime-level
+  reproducibility.
+- The evaluation system should distinguish these failure classes.
+
+
+4.3 CONTEXT GARBAGE COLLECTION
+--------------------------------------------------------------------------------
+
+Do not manage context merely as "oldest tokens first."
+
+Treat context as managed state with:
+
+- ROOTS: task goal, hard constraints, active architecture, tool contracts,
+  unresolved failures, committed decisions, required provenance.
+- LIVE STATE: currently relevant evidence, intermediate results, active plan,
+  tool results, temporary working memory.
+- GARBAGE/COLD STATE: superseded details, completed intermediate work, raw logs,
+  redundant explanations, stale retrieved material.
+
+Suggested metadata per context object:
+
+    id
+    type
+    source
+    provenance
+    created
+    last_used
+    importance
+    ttl
+    immutable
+    supersedes
+    summary_of
+    content_hash
+    retrieval_key
+    verification_status
+
+Retention ladder:
+
+    active verbatim context
+      -> compacted historical context
+      -> durable external state
+      -> retrieval on demand
+
+Do not allow compaction to destroy hard constraints or provenance.
+
+
+4.4 EXECUTABLE ENVIRONMENTS AND VERIFIERS
+--------------------------------------------------------------------------------
+
+The 1500 research pass strengthens the case that verifiers are not merely test
+utilities. They are part of the capability architecture.
+
+For software/system tasks, favor feedback from:
+
+- compiler
+- type checker
+- unit tests
+- integration tests
+- parser/schema validator
+- static analyzer
+- diff checker
+- filesystem state
+- command exit status
+- performance profiler
+- known-answer oracle where available
+
+Use LLM-as-judge only when a deterministic or executable verifier is not
+available or is insufficient.
+
+Important failure-analysis rule:
+Aggregate pass rate is not enough. Track behavioral failure classes such as:
+
+- reward hacking / verifier gaming
+- avoiding difficult low-level work
+- input-specific shortcuts
+- silent constraint dropping
+- unsupported assertions
+- tool misuse
+- repeated ineffective retries
+- context corruption
+- false success declaration
+
+
+4.5 EXPLICIT AGENT STATE MACHINE
+--------------------------------------------------------------------------------
+
+Refine the v1 loop to:
+
+    OBSERVE
+      -> BUILD_CONTEXT
+      -> PLAN
+      -> VALIDATE_PLAN
+      -> ACT
+      -> OBSERVE_RESULT
+      -> VERIFY
+      -> COMMIT or ROLLBACK
+      -> UPDATE_STATE
+      -> CONTINUE or TERMINATE
+
+Each state transition should have:
+
+- entry criteria
+- allowed actions
+- required inputs
+- produced outputs
+- verifier/check
+- failure path
+- retry budget
+- rollback semantics
+- trace record
+
+This keeps the agent loop bounded and testable.
+
+
+4.6 JIT RETRIEVAL WITH PROVENANCE
+--------------------------------------------------------------------------------
+
+Use retrieval to bring context back only when needed instead of permanently
+stuffing all state into the active prompt.
+
+Each retrieved item should preserve:
+
+- source
+- timestamp/version
+- relevance score
+- retrieval query
+- provenance
+- freshness/expiry
+- trust level
+- whether it was actually used in the decision
+
+Retrieval must be evaluated. Measure at minimum:
+
+- recall of required evidence
+- ranking quality
+- stale-result rate
+- irrelevant-context rate
+- downstream effect on verified task success
+
+
+================================================================================
+5. P1 SYSTEM OPTIMIZATIONS
+================================================================================
+
+5.1 CONFIDENCE-AWARE TEST-TIME COMPUTE ALLOCATION — NEW 1500 OBSERVATION
+--------------------------------------------------------------------------------
+
+UC Berkeley 2026 work on agentic test-time scaling reports that simply spending
+more inference compute at every step gives diminishing returns in long-horizon
+agent tasks. A more efficient approach is to spend extra compute when the
+decision is actually uncertain.
+
+Practical Fullstack AI adaptation:
+
+For each consequential action, estimate an ambiguity signal such as:
+
+- entropy across sampled candidate actions
+- top-1 vs top-2 action-score margin
+- verifier disagreement
+- rubric tie
+- confidence threshold
+- repeated failure at the same state
+
+Then:
+
+LOW ambiguity:
+    choose the action with normal/cheap inference.
+
+MEDIUM ambiguity:
+    request one additional sample, critique, or verifier pass.
+
+HIGH ambiguity:
+    allocate extra reasoning/test-time compute, invoke an arbiter/verifier,
+    route to a stronger model if available, or stop for user confirmation.
+
+This is a better v1/v2 policy than a fixed "always think harder" setting.
+
+Connection to the Invariant newsletter:
+- The newsletter recommends widening separation among top token choices.
+- At the agent level, Fullstack AI should similarly track separation among top
+  ACTION/DECISION choices.
+- A small top-1/top-2 decision margin is a concrete sign that the controller
+  should spend more effort before acting.
+
+
+5.2 CAPABILITY-AWARE MODEL ROUTING — STRENGTHENED 1500 OBSERVATION
+--------------------------------------------------------------------------------
+
+Recent Berkeley multi-model work reinforces a simple resource rule:
+
+    Allocate expensive/capable model effort where marginal utility is
+    highest.
+
+Fullstack AI adaptation:
+
+- cheap/local default path handles routine parsing, formatting, retrieval,
+  deterministic classification, and well-verified actions.
+- stronger path is reserved for:
+    * low-margin decisions
+    * verifier failure
+    * hard planning
+    * high-impact irreversible actions
+    * difficult recovery
+    * complex synthesis
+
+This does NOT require new binaries or a permanent multi-agent swarm.
+It is a controller policy.
+
+
+5.3 KV CACHE TTL ACROSS TOOL PAUSES
+--------------------------------------------------------------------------------
+
+Agentic inference differs from ordinary chat because tool calls create pauses.
+
+Do not automatically evict useful model state just because the model is
+temporarily waiting on a tool.
+
+Conceptual loop:
+
+    LLM
+      -> tool call
+      -> retain useful KV/prefix state for a bounded TTL
+      -> tool returns
+      -> resume with cache reuse when valid
+
+TTL policy should consider:
+
+- cache size
+- reload/recompute cost
+- expected tool duration
+- memory pressure
+- queue pressure
+- model identity
+- context identity
+- whether the tool result invalidates cached assumptions
+
+
+5.4 HIERARCHICAL CACHE + LOAD-LATENCY-AWARE SCHEDULING — NEW 1500 DETAIL
+--------------------------------------------------------------------------------
+
+Stanford Contextra research strengthens an important point:
+
+Hierarchical caching is not just a storage-placement problem. The scheduler must
+account for the time required to LOAD cached state.
+
+Fullstack AI cache hierarchy should eventually distinguish:
+
+    exact-result cache
+      -> stable-prefix cache
+      -> active KV/context cache
+      -> RAM-resident cold cache
+      -> durable retrieved state
+      -> recomputation
+
+Each cache record should include:
+
+- model identity/hash
+- tokenizer identity/hash
+- runtime version
+- prefix/context hash
+- decision-state hash where relevant
+- tier/location
+- size
+- creation time
+- last use
+- load latency estimate
+- recompute latency estimate
+- TTL
+- validation status
+
+Scheduling objective:
+Choose reuse only when the total validated reuse cost is better than recompute.
+
+On local CPU hardware, the analogous hierarchy may be:
+L1/L2/L3/runtime memory -> RAM -> mmap/file-backed state -> recompute.
+The exact mechanism should follow profiling rather than GPU-server assumptions.
+
+
+5.5 MEMORY MOVEMENT AS A FIRST-CLASS METRIC — NEW 1500 OBSERVATION
+--------------------------------------------------------------------------------
+
+Berkeley 2026 inference work emphasizes that long-context inference increasingly
+becomes a memory-bandwidth/KV-traffic problem rather than a pure compute
+problem.
+
+For local Fullstack AI, add measurements such as:
+
+- bytes of model state read per generated token
+- KV bytes retained per token
+- KV bytes copied/moved per turn
+- cache reload bytes
+- context prefill bytes/time
+- memory bandwidth during decode
+- verified tokens/sec
+- verified task progress per GB moved
+
+Optimization implication:
+A change that reduces FLOPs but increases memory traffic may be a regression on
+the target machine.
+
+
+5.6 CHECKPOINT / BACKTRACK / RETRY
+--------------------------------------------------------------------------------
+
+Adopt explicit branchpoints only around bounded/reversible operations.
+
+A branchpoint record should include:
+
+- state snapshot identifier
+- intended action
+- verifier
+- retry budget
+- alternate candidates
+- rollback path
+
+Do not blindly retry the same model call.
+A retry must change at least one useful dimension:
+- context
+- candidate action
+- verifier feedback
+- model/routing
+- search strategy
+- tool choice
+
+Parallel retry/search remains optional and should be resource bounded.
+
+
+5.7 REPETITION-AWARE SPECULATION — NEW 1500 OBSERVATION
+--------------------------------------------------------------------------------
+
+CMU 2026 SuffixDecoding work is especially relevant to agent loops because
+agentic workloads often repeat similar prompts, code patterns, self-refinement
+formats, and tool-control sequences.
+
+Experimental Fullstack AI concept:
+
+- maintain suffix/pattern statistics from prior accepted generations
+- speculate longer when repeated patterns have high acceptance
+- speculate shorter or disable when acceptance falls
+- validate every speculative token/path against the target model
+
+This may be more attractive for local agent workloads than a permanently loaded
+draft model because it can exploit repeated agent structure with low added model
+memory.
+
+Treat as P1/P2 experimental work only after baseline correctness metrics exist.
+
+
+================================================================================
+6. P2 ADAPTIVE/AUTOTUNED OPTIMIZATION
+================================================================================
+
+6.1 VERIFIED GOODPUT
+--------------------------------------------------------------------------------
+
+Do not optimize only tokens/second.
+
+Define a project metric in the form:
+
+    VERIFIED GOODPUT =
+        useful verified task progress
+--------------------------------------------------------------------------------
+        elapsed resource cost
+
+Possible denominator components:
+- wall time
+- CPU time
+- memory bytes moved
+- tokens generated
+- model calls
+- tool calls
+- energy estimate where available
+
+Possible numerator:
+- verified subgoals completed
+- verified structured decisions
+- validated code/test progress
+- completed task score
+
+v2 autotuning should retain a runtime change only when verified goodput improves
+without unacceptable reliability regression.
+
+
+6.2 ADAPTIVE SPECULATIVE DECODING
+--------------------------------------------------------------------------------
+
+Vary speculation depth based on observed acceptance/goodput rather than fixing
+one value globally.
+
+Inputs to adaptation:
+- task type
+- current context length
+- recent acceptance rate
+- latency
+- cache pressure
+- model pair
+- tool-loop repetition
+- verifier success
+
+
+6.3 CROSS-MODEL KV TRANSFER
+--------------------------------------------------------------------------------
+
+Preserve the NVIDIA cross-model KV-transfer work as an experiment.
+
+Before enabling a source/target model pair, measure:
+
+- architecture/KV geometry compatibility
+- mapped-vs-native output quality
+- prefill time saved
+- mapping time
+- RAM/storage overhead
+- multi-turn stability
+- effect on structured decisions
+- effect on verifier pass rate
+
+Automatically disable a mapping pair that fails the quality/reliability gate.
+
+
+6.4 NUMERIC/BATCH DETERMINISM
+--------------------------------------------------------------------------------
+
+When reproducibility mode is enabled, record and where possible control:
+
+- batch composition
+- thread count
+- kernel/runtime version
+- model hash
+- tokenizer hash
+- sampling parameters
+- RNG seed where relevant
+- floating-point mode
+- scheduler mode
+
+Reproducibility testing should repeat the same structured task under:
+- identical batch/runtime conditions
+- changed concurrency/batch conditions
+- changed thread/scheduler conditions
+
+The output report should say whether variation arose at:
+- decision level
+- decoding level
+- runtime numeric level
+
+
+================================================================================
+7. P3 MODEL-LEVEL EXPERIMENTS
+================================================================================
+
+7.1 KVAlign-LIKE INTER-LAYER KV SHARING — NEW 1500 OBSERVATION
+--------------------------------------------------------------------------------
+
+Berkeley KVAlign research investigates sharing KV state across neighboring
+transformer layers based on representational similarity, with lightweight
+self-distillation to recover quality.
+
+Potential payoff:
+- materially lower KV memory
+- higher long-context throughput
+
+Why it is P3 for Fullstack AI:
+- requires model adaptation/training, not just controller/runtime policy
+- quality loss must be characterized
+- changes the model/runtime contract
+- not required for fsllama8 behavioral parity
+- should not distract from v0 controller/state correctness
+
+Treat this as a future fsmodel8/fsmono8 research branch after the system can
+measure long-context memory pressure accurately.
+
+
+7.2 MAJOR ARCHITECTURE CHANGES
+--------------------------------------------------------------------------------
+
+Defer as default-path work:
+- MoE changes
+- sparse/hybrid attention
+- Mamba/state-space redesign
+- aggressive latent context compression
+- operator-level disaggregation
+- large autonomous agent swarms
+
+These remain reading-list items until a measured bottleneck justifies them.
+
+
+================================================================================
+8. DESIGN GATES
+================================================================================
+
+No optimization becomes a default merely because it was faster in one run.
+
+A candidate optimization must pass:
+
+GATE A — CORRECTNESS
+- same intended task semantics
+- no lost hard constraints
+- verifier pass rate not degraded beyond defined threshold
+
+GATE B — RELIABILITY
+- repeated-run reliability
+- failure-mode distribution
+- no new silent-success class
+
+GATE C — REPRODUCIBILITY
+- configuration captured
+- model/runtime/tool versions captured
+- trace replayable enough to diagnose differences
+
+GATE D — RESOURCE EFFECT
+- latency
+- CPU
+- RAM
+- memory movement
+- tokens
+- cache footprint
+- startup/loading cost
+
+GATE E — VERIFIED GOODPUT
+- net improvement on target local hardware
+
+GATE F — REVERSIBILITY
+- can disable/rollback cleanly
+- baseline path retained for comparison
+
+
+================================================================================
+9. REQUIRED TELEMETRY
+================================================================================
+
+Per session:
+- model identity/hash
+- runtime identity/version
+- tokenizer identity/hash
+- controller version
+- config hash
+- start/end timestamps
+
+Per model turn:
+- input token count
+- output token count
+- prefill time
+- decode time
+- first-token latency
+- tokens/sec
+- context occupancy
+- cache hits/misses
+- cache tier
+- cache bytes loaded/moved
+- decision margin/uncertainty if available
+
+Per tool action:
+- action id
+- tool
+- arguments hash
+- start/end time
+- exit/result status
+- reversible yes/no
+- verifier result
+
+Per agent trajectory:
+- state transitions
+- retries
+- branchpoints
+- verifier failures
+- rollback events
+- final verified outcome
+- total resource cost
+- verified-goodput score
+
+
+================================================================================
+10. UPDATED IMPLEMENTATION ORDER
+================================================================================
+
+STEP 0 — Preserve fsllama8 reference behavior and test gates.
+
+STEP 1 — fsghost8/fsmono8 v0 parity instrumentation:
+- same baseline functionality
+- structured transaction trace
+- explicit decision/result schemas
+- context-object metadata
+- deterministic validators where possible
+- repeated-run reliability harness
+
+STEP 2 — Context lifecycle:
+- roots/live/cold classification
+- compaction
+- durable state
+- JIT retrieval
+- provenance
+
+STEP 3 — v1 closed-loop state machine:
+- plan
+- validate
+- bounded act
+- observe
+- verify
+- commit/rollback
+- update
+
+STEP 4 — Add uncertainty telemetry:
+- decision margins
+- verifier disagreement
+- repeated-failure signal
+
+STEP 5 — Add confidence-aware extra compute/routing:
+- spend more only when ambiguity or consequence justifies it
+
+STEP 6 — Add cache lifecycle:
+- prefix reuse
+- KV/context TTL across tool pauses
+- hierarchical tiers
+- load-vs-recompute decision
+
+STEP 7 — Add bounded checkpoint/backtrack/retry.
+
+STEP 8 — Add repetition-aware/speculative acceleration experiments.
+
+STEP 9 — Add v2 verified-goodput autotuning.
+
+STEP 10 — Only then evaluate deeper model/runtime experiments:
+- cross-model KV transfer
+- inter-layer KV sharing
+- model architecture changes
+
+
+================================================================================
+11. 1500 RESEARCH-PASS OBSERVATIONS — SUMMARY
+================================================================================
+
+NEW OBSERVATION #1:
+Extra inference compute should be conditional, not uniform.
+Use decision uncertainty/action margins to decide when to spend more compute.
+
+NEW OBSERVATION #2:
+Executable environments and dense verifiers are themselves a capability
+multiplier. Verification architecture belongs in the system design, not merely
+in QA scripts.
+
+NEW OBSERVATION #3:
+Cache scheduling must account for cache LOAD cost, not just hit/miss status.
+
+NEW OBSERVATION #4:
+For long context, memory movement and KV traffic can dominate compute.
+Measure bytes moved per verified task progress.
+
+NEW OBSERVATION #5:
+Agent loops contain repeated token/prompt/output patterns. Repetition-aware
+suffix speculation may be a particularly good local-runtime optimization.
+
+NEW OBSERVATION #6:
+Multi-model routing should allocate capability according to marginal utility.
+Strong models should be escalation paths, not necessarily the default for every
+step.
+
+NEW OBSERVATION #7:
+Inter-layer KV sharing is becoming a plausible model-level optimization, but it
+requires adaptation and should remain a later experiment.
+
+NEW OBSERVATION #8:
+The best current architecture continues to converge on a modular LOGICAL agent
+loop—planner/executor/verifier/generator/memory semantics—without requiring
+separate processes or binaries for each logical role.
+
+NEW OBSERVATION #9:
+Fullstack AI should expose "decision margin" as a first-class control signal,
+analogous to the newsletter's concern about near-tied token probabilities, but
+at the action-selection level.
+
+NEW OBSERVATION #10:
+Optimization should be closed-loop:
+measure -> choose optimization -> execute -> verify -> compare -> retain/revert.
+This is the same basic control principle intended for Fullstack AI v2 itself.
+
+
+================================================================================
+12. READING / REFERENCE LIST
+================================================================================
+
+USER-SUPPLIED REFERENCES
+--------------------------------------------------------------------------------
+
+Lan Chu Huong LinkedIn post:
+https://www.linkedin.com/posts/lanchuhuong_the-paper-weve-been-waiting-for-nvidia-activity-7496204928458338304-h7pJ
+
+Utkarsh Bajaj LinkedIn post:
+https://www.linkedin.com/posts/utkarsh-bajaj_aiagents-contextengineering-llmengineering-activity-7496185523695280128-6-tw
+
+Samuel A. Gray III LinkedIn post:
+https://www.linkedin.com/posts/samuel-a-gray-iii-1667b238b_aiengineering-andrewng-softwaredevelopment-activity-7496266189665492992-p5ux
+
+The Invariant Newsletter, Issue 14:
+"Randomness and Determinism in LLMs"
+User-provided newsletter text preserved in Fullstack AI project context.
+
+Stanford CS229 Lecture Notes:
+Tengyu Ma and Andrew Ng
+Uploaded Fullstack AI reference:
+CS229_transformer_course _main_notes-20260818.pdf
+
+1700 LINK UPDATE — USER-SUPPLIED REFERENCES
+--------------------------------------------------------------------------------
+
+Alvaro Cintas LinkedIn post:
+https://www.linkedin.com/posts/alvaro-cintas_you-can-now-run-a-28-trillion-parameter-activity-7495936533078827008-8zQZ
+
+Aurimas Griciunas LinkedIn post:
+https://www.linkedin.com/posts/aurimas-griciunas_this-is-how-you-measure-your-ai-system-as-activity-7495446950415179779-Ozie
+
+Notes:
+- The Alvaro Cintas URL was supplied twice in the 1700 update; it is retained
+  once.
+- The Aurimas Griciunas reference is retained as Fullstack AI
+  evaluation/measurement/QA reference material.
+
+
+PRIOR HIGH-PRIORITY RESEARCH REFERENCES
+--------------------------------------------------------------------------------
+
+Anthropic — Effective context engineering for AI agents:
+https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
+
+Thinking Machines Lab — Defeating Nondeterminism in LLM Inference:
+https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/
+
+Princeton — Holistic Agent Leaderboard:
+https://hal.cs.princeton.edu/
+
+MIT CSAIL — EnCompass:
+https://news.mit.edu/2026/helping-ai-agents-search-to-get-best-results-from-llms-0205
+
+Ai2 — olmo-eval:
+https://allenai.org/blog/olmo-eval
+
+Ai2 — Signal and Noise:
+https://allenai.org/blog/signal-noise
+
+
+1500 RESEARCH-PASS ADDITIONS / PRIORITY REFERENCES
+--------------------------------------------------------------------------------
+
+UC Berkeley — Continuum: Efficient and Robust Multi-Turn LLM Agent Scheduling
+with KV Cache Time-to-Live:
+https://www2.eecs.berkeley.edu/Pubs/TechRpts/2026/EECS-2026-234.html
+
+Stanford MAST Lab — Contextra: Hierarchical Context Caching for Long Context
+Language Model Serving:
+https://mast.stanford.edu/pubs/strata/
+
+UC Berkeley — Building Open Source Inference Serving Systems:
+https://www2.eecs.berkeley.edu/Pubs/TechRpts/2026/EECS-2026-206.html
+
+UC Berkeley — Memory-Efficient LLM Inference Algorithms:
+https://www2.eecs.berkeley.edu/Pubs/TechRpts/2026/EECS-2026-175.html
+
+UC Berkeley — Scaling Environments and Verifiers for Software Engineering
+Agents:
+https://www2.eecs.berkeley.edu/Pubs/TechRpts/2026/EECS-2026-52.html
+
+UC Berkeley — Agentic Test-Time Scaling for WebAgents / CATTS:
+https://arxiv.org/abs/2602.12276
+
+Stanford — AgentFlow: In-the-Flow Agentic System Optimization:
+https://agentflow.stanford.edu/
+
+CMU — SuffixDecoding: Extreme Speculative Decoding for Emerging AI Applications:
+https://www.cs.cmu.edu/afs/cs.cmu.edu/Web/Posters/CSSpeakingSkills-GabrieleOliaro26.pdf
+
+UC Berkeley — Squeeze Evolve: Unified Multi-Model Orchestration for
+Verifier-Free Evolution:
+https://www2.eecs.berkeley.edu/Pubs/TechRpts/2026/EECS-2026-207.html
+
+UC Berkeley — KVAlign: A Quality-Preserving Method for Inter-Layer KV Cache
+Sharing:
+https://people.eecs.berkeley.edu/~kubitron/courses/cs262a-F25/projects/reports/project1007_paper_35544340631323499427.pdf
+
+CMU — Rethinking the AI Stack: Systems for Agents and Agents for Systems:
+https://www.cs.cmu.edu/afs/cs.cmu.edu/Web/Posters/CSThesis-GabrieleOliaro26.pdf
+
+Berkeley 2026 report index — includes additional watch-list items such as
+Toward Stateful Execution Interfaces for Language Model Agents:
+https://www2.eecs.berkeley.edu/Pubs/TechRpts/2026/
+
+
+================================================================================
+13. FINAL WORKING PRINCIPLE
+================================================================================
+
+For Fullstack AI, the optimization target is not:
+
+    maximum raw model output
+
+It is:
+
+    maximum VERIFIED, REPRODUCIBLE, USEFUL agent progress
+    per unit of local compute, memory movement, latency, and complexity.
+
+The system should become more capable by becoming more structured,
+more observable, more selective about where it spends compute, and more
+effective at reusing valid state.
+
+That principle should guide both fsghost8 and fsmono8 development.
+
+================================================================================
+14. 1710 ARCHITECTURE CLARIFICATION — CUSTOM FSGHOST8 + CUSTOM FSMONO8
+================================================================================
+
+Ultimate direction:
+
+    Build a custom fsghost8 together with a custom fsmono8 as a deliberately
+    co-designed Fullstack AI pair.
+
+This is stronger than treating fsghost8 or fsmono8 merely as wrappers around
+existing inference runtimes.
+
+fsghost8 remains the controller/control-plane and reference-semantics side:
+- structured decisions
+- explicit state transitions
+- context/state policy
+- retrieval policy
+- tool policy
+- verification policy
+- retry/backtrack/rollback policy
+- routing/escalation policy
+- telemetry definitions
+- reproducible traces
+
+fsmono8 remains the custom integrated/monolithic runtime target:
+- implements the same intended semantics
+- tighter execution path
+- tighter state integration
+- cache/prefix/KV lifecycle
+- scheduling
+- memory movement
+- inference fast paths
+- reduced serialization/copy/process overhead
+- integrated observability hooks
+
+Core design relationship:
+
+    fsghost8 defines and validates intended agent/controller semantics.
+        ->
+    fsmono8 integrates those semantics into a custom monolithic runtime.
+        ->
+    common QA/telemetry verifies behavioral parity and measured improvement.
+
+fsmono8 should therefore be optimized against fsghost8/reference behavior rather
+than allowed to drift into a different agent.
+
+fsmodel8 remains a separate custom-model track unless the architecture is
+explicitly changed later.
+
+
+================================================================================
+15. QUADUI / DASHBOARD ROLE
+================================================================================
+
+Use a spare QuadUI pane as the standard Fullstack AI dashboard/monitor.
+
+The dashboard should be a reusable Qt QWidget that can:
+- run embedded in a QuadUI panel;
+- pop out into a fullscreen Qt monitor window using an open/pop-out control;
+- automatically return to its original QuadUI panel when the fullscreen window
+  is closed;
+- preserve one dashboard instance rather than creating separate embedded and
+  fullscreen copies.
+
+Ownership rule:
+
+    closing monitor window != deleting dashboard
+
+The fullscreen window is a temporary container. QuadUI retains logical ownership
+and reattaches the dashboard widget when the pop-out window closes.
+
+The dashboard should observe structured telemetry rather than own agent logic.
+
+Initial dashboard areas:
+- model/runtime/controller identity
+- current controller state
+- inference latency / tokens/sec / context occupancy
+- decision margin / uncertainty / confidence
+- verifier state and result
+- context roots/live/cold state
+- retrieval/provenance activity
+- prefix/KV/cache state and TTL
+- tool activity and exit status
+- retries / branchpoints / rollback events
+- memory movement
+- verified-goodput
+- reproducibility/trace status
+
+Design the telemetry interface so the dashboard can eventually support:
+
+    [ fsghost8 ]   [ fsmono8 ]   [ comparison ]
+
+The comparison mode should make the dashboard useful as an engineering
+instrument
+for determining whether fsmono8 preserves fsghost8 semantics while improving
+latency, memory behavior, cache reuse, throughput, reliability, and verified
+goodput.
+
+The detachable-panel mechanism should preferably be implemented generically in
+QuadUI so other panes can later use the same embedded <-> fullscreen behavior.
+
+
+================================================================================
+16. 1710 WORKING CONCLUSION
+================================================================================
+
+The Fullstack AI development target is now best expressed as:
+
+    CUSTOM FSGHOST8
+        controller/reference semantics
+                +
+    CUSTOM FSMONO8
+        integrated monolithic execution
+                +
+    QUADUI DASHBOARD
+        shared observation, QA, comparison, and optimization surface
+
+The implementation discipline remains:
+
+    measure -> stabilize -> structure -> verify -> manage state/context
+        -> cache -> accelerate -> adapt
+
+The dashboard is part of the measurement/observability architecture, not a new
+agent role or a separate semantic layer.
