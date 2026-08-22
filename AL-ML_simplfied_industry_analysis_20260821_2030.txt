@@ -2,9 +2,12 @@ R&D INDUSTRY EVOLUTION DUE TO AI/ML
 Coherent Working Post
 Timestamp: 2026-08-21 20:30 MT
 
-Assume, as a deliberately simplified model, that the entire capitalist system is represented by Company A. Company A begins with 100 traditional engineers and software developers across its engineering and IT teams.
+Assume, as a deliberately simplified model, that the entire capitalist system is represented by Company A. 
+Company A begins with 100 traditional engineers and software developers across its engineering and IT teams.
 
-Each year, Company A trades exactly 25 of those original 100 traditional engineering/IT positions for 25 AI/ML engineering positions. Total engineering/IT headcount therefore remains constant at 100:
+Each year, Company A trades exactly 25 of those original 100 traditional engineering/IT positions 
+for 25 AI/ML engineering positions. 
+Total engineering/IT headcount therefore remains constant at 100:
 
  Y0:  100 trad,  0 AI/ML
  Y1:  75 trad, 25 AI/ML
@@ -12,7 +15,10 @@ Each year, Company A trades exactly 25 of those original 100 traditional enginee
  Y3:  25 trad, 75 AI/ML
  Y4:  0 trad, 100 AI/ML
 
-Now make an intentionally aggressive productivity assumption. Each incoming AI/ML cohort begins at 2x the productivity of a traditional engineer, and the effective productivity of that cohort doubles each year as models, tools, compute, workflows, training, and organizational experience improve.
+Now make an intentionally aggressive productivity assumption. 
+Each incoming AI/ML cohort begins at 2x the productivity of a traditional engineer, 
+and the effective productivity of that cohort doubles each year as models, tools, 
+compute, workflows, training, and organizational experience improve.
 
 At the end of Year 4, the four 25-person cohorts would therefore operate at:
 
@@ -27,23 +33,46 @@ Because each cohort represents one-quarter of the original workforce, aggregate 
   = 0.25 x 30
   = 7.5x
 
-So the same 100-person engineering/IT organization is now, under these assumptions, producing the equivalent of 750 traditional-engineer units of output.
+So the same 100-person engineering/IT organization is now, under these assumptions, 
+producing the equivalent of 750 traditional-engineer units of output.
 
-Company A could theoretically increase compensation in proportion to that productivity gain, but being profit-minded it does not need to. Suppose it merely doubles compensation for the AI/ML engineers while keeping headcount at 100. Even after adding substantially higher AI-processing, compute, infrastructure, integration, and support costs, the company may still have a large economic surplus if it can monetize a meaningful fraction of the 7.5x increase in productive capacity.
+Company A could theoretically increase compensation in proportion to that productivity gain, 
+but being profit-minded it does not need to. Suppose it merely doubles compensation 
+for the AI/ML engineers while keeping headcount at 100. Even after adding substantially higher AI-processing, 
+compute, infrastructure, integration, and support costs, the company may still have a large economic surplus 
+if it can monetize a meaningful fraction of the 7.5x increase in productive capacity.
 
-The important point is that productivity is not identical to revenue. A firm that can produce 7.5 times as much engineering output cannot automatically sell 7.5 times as much product. Demand, competition, pricing, regulation, product quality, capital requirements, and sales capacity all limit how much of the technical productivity gain becomes revenue or earnings.
+The important point is that productivity is not identical to revenue. 
+A firm that can produce 7.5 times as much engineering output cannot automatically sell 7.5 times as much product. 
+Demand, competition, pricing, regulation, product quality, capital requirements, 
+and sales capacity all limit how much of the technical productivity gain becomes revenue or earnings.
 
-But suppose Company A manages to turn enough of that increased capacity into, say, 5x the former revenue attributable to those engineering activities while its related costs rise by less than the resulting increase in gross profit. Then the economics become very favorable. The precise result depends on the company's original margins and cost structure; there is no automatic break-even rule simply because one category of cost rises by some chosen multiple.
+But suppose Company A manages to turn enough of that increased capacity into, say, 
+5x the former revenue attributable to those engineering activities while its related costs rise 
+by less than the resulting increase in gross profit. Then the economics become very favorable. 
+The precise result depends on the company's original margins and cost structure; 
+there is no automatic break-even rule simply because one category of cost rises by some chosen multiple.
 
-The same caution applies to P/E. A company's P/E ratio cannot be calculated by averaging P/E ratios across employee groups. P/E is a company-level ratio of market price to earnings. A more defensible way to state the argument is this: if 100 engineering/IT employees represent only a small share of a 2,000-person company's total resources, but the economic contribution of those 100 people rises disproportionately, total corporate earnings can increase materially without the rest of the firm's costs increasing at the same rate.
+The same caution applies to P/E. 
+A company's P/E ratio cannot be calculated by averaging P/E ratios across employee groups. 
+P/E is a company-level ratio of market price to earnings.  
+If 100 engineering/IT employees represent only a small share of a 2,000-person company's total resources, 
+but the economic contribution of those 100 people rises disproportionately, 
+total corporate earnings can increase materially without the rest of the firm's costs increasing at the same rate.
 
-If financial markets reward that combination of revenue growth, earnings growth, margins, and expected future productivity, Company A becomes more attractive to investors. More capital then flows toward AI/ML.
+If financial markets reward that combination of revenue growth, earnings growth, margins, 
+and expected future productivity, Company A becomes more attractive to investors. 
+More capital then flows toward AI/ML.
 
 And this is where the argument becomes more interesting.
 
 More AI/ML investment does not necessarily mean more AI/ML hiring.
 
-Once Company A has converted all 100 engineering/IT positions into AI/ML-capable positions, additional investment can continue increasing the productivity of those same 100 people. Better models, faster and cheaper inference, improved tooling, more capable agents, better data, better integration, better training, and improved organizational workflows can all raise output per employee without increasing engineering headcount.
+Once Company A has converted all 100 engineering/IT positions into AI/ML-capable positions, 
+additional investment can continue increasing the productivity of those same 100 people. 
+Better models, faster and cheaper inference, improved tooling, more capable agents, better data, 
+better integration, better training, and improved organizational workflows 
+can all raise output per employee without increasing engineering headcount.
 
 The capital-side feedback loop can therefore continue:
 
@@ -63,19 +92,28 @@ Meanwhile, the labor market can move in a very different direction:
         -> firms have less need to expand AI/ML headcount
         -> existing AI/ML staff continue becoming more productive
 
-That means the market for AI/ML engineers can saturate rapidly even while the capitalist system continues to reward increasingly large investments in AI/ML.
+That means the market for AI/ML engineers can saturate rapidly even while the capitalist system 
+continues to reward increasingly large investments in AI/ML.
 
 This is the key distinction: demand for AI/ML investment and demand for AI/ML labor do not have to grow together.
 
-During the transition, firms may hire aggressively because they need people who can build, integrate, and operate AI systems. But once a company has restructured its technical workforce, continued productivity growth can come from increasing the leverage of the engineers it already has rather than hiring more of them.
+During the transition, firms may hire aggressively because they need people who can 
+build, integrate, and operate AI systems. But once a company has restructured its technical workforce, 
+continued productivity growth can come from increasing the leverage of the engineers it already has 
+rather than hiring more of them.
 
-In fact, the more successful AI/ML becomes at increasing per-worker productivity, the weaker the requirement becomes for employment growth to keep pace with investment growth.
+In fact, the more successful AI/ML becomes at increasing per-worker productivity, the weaker the requirement 
+becomes for employment growth to keep pace with investment growth.
 
 That produces a potentially paradoxical outcome:
 
-AI/ML can become an increasingly attractive destination for capital at exactly the same time that AI/ML engineering becomes an increasingly saturated labor market.
+AI/ML can become an increasingly attractive destination for capital at exactly the same time that 
+AI/ML engineering becomes an increasingly saturated labor market.
 
-Companies can invest more in AI without proportionally increasing AI staffing. Their existing AI/ML engineers become more productive, which increases the potential earnings generated by those same employees. Those earnings attract more investment, which further improves the technology available to the existing workforce, which can raise productivity again.
+Companies can invest more in AI without proportionally increasing AI staffing. 
+Their existing AI/ML engineers become more productive, which increases the potential earnings 
+generated by those same employees. Those earnings attract more investment, which further improves 
+the technology available to the existing workforce, which can raise productivity again.
 
 The resulting cycle is therefore not simply:
 
@@ -98,7 +136,11 @@ At the same time:
 
 Both processes can occur simultaneously.
 
-That is the central hypothesis: AI/ML may continue to absorb a growing share of corporate capital while requiring a shrinking amount of additional labor for each additional unit of productive capacity. The winners may therefore be companies that already possess strong AI/ML teams, the engineers whose skills remain highly leveraged inside those teams, and the owners of the capital, models, compute, data, and infrastructure that continue amplifying their productivity.
+That is the central hypothesis: AI/ML may continue to absorb a growing share of corporate capital 
+while requiring a shrinking amount of additional labor for each additional unit of productive capacity. 
+The winners may therefore be companies that already possess strong AI/ML teams, 
+the engineers whose skills remain highly leveraged inside those teams, 
+and the owners of the capital, models, compute, data, and infrastructure that continue amplifying their productivity.
 
 The most important question is not simply:
 
@@ -106,8 +148,13 @@ The most important question is not simply:
 
 It is:
 
-    "How quickly can the supply of AI/ML engineers exceed the number of new AI/ML positions firms actually need, while continued capital investment keeps increasing the productivity and earnings of the AI/ML engineers already employed?"
+    "How quickly can the supply of AI/ML engineers exceed the number of new AI/ML positions firms actually need, 
+    while continued capital investment keeps increasing the productivity and earnings 
+    of the AI/ML engineers already employed?"
 
-That is the mechanism by which an AI/ML labor market can become saturated even while AI/ML itself remains one of the most heavily rewarded areas of corporate investment.
+That is the mechanism by which an AI/ML labor market can become saturated even while AI/ML itself 
+remains one of the most heavily rewarded areas of corporate investment.
 
-The Capitalist System rapidly converts more of its technical staff into staff that uses AI/ML to monetize its work. As AI/ML productivity rises, fewer additional AI/ML employees will be needed. Growth is bound by capital input from available sources.
+The Capitalist System rapidly converts more of its technical staff into staff that uses AI/ML to monetize its work. 
+As AI/ML productivity rises, fewer additional AI/ML employees will be needed. 
+Growth is bound by capital input from available sources.
