@@ -1,12 +1,6 @@
 R&D INDUSTRY EVOLUTION DUE TO AI/ML
 Coherent Working Post
-Timestamp: 2026-08-21 20:00 MT
-
-I can't say that I share your research experience, but my guess is that advertising some AI/ML Eng/IT jobs at unusually high salaries has had the predictable effect of flooding those openings with applications. At the same time, employers, recruiters, consultancies, startups, and displaced/Eng-IT staff have strong incentives to develop credible AI-based alternatives to traditional engineering work.
-
-That creates an unusual supply-and-demand relationship because AI can push on both sides of the labor market at once. High compensation and perceived scarcity can rapidly increase the supply of people pursuing AI/ML skills and jobs, while firms continue increasing their demand for AI/ML capability. But demand for AI/ML capability is not the same thing as demand for ever more AI/ML employees.
-
-"So what does that mean?" you say.
+Timestamp: 2026-08-21 20:30 MT
 
 Assume, as a deliberately simplified model, that the entire capitalist system is represented by Company A. Company A begins with 100 traditional engineers and software developers across its engineering and IT teams.
 
@@ -115,3 +109,5 @@ It is:
     "How quickly can the supply of AI/ML engineers exceed the number of new AI/ML positions firms actually need, while continued capital investment keeps increasing the productivity and earnings of the AI/ML engineers already employed?"
 
 That is the mechanism by which an AI/ML labor market can become saturated even while AI/ML itself remains one of the most heavily rewarded areas of corporate investment.
+
+The Capitalist System rapidly converts more of its technical staff into staff that uses AI/ML to monetize its work. As AI/ML productivity rises, fewer additional AI/ML employees will be needed. Growth is bound by capital input from available sources.
